@@ -1,6 +1,6 @@
 # Licensing and provenance review
 
-TavernDroid proposes GPL-3.0-only to preserve the upstream GPLv3 direction. Maintainer approval is required before installing a root LICENSE or copying/adapting upstream code. The current documentation does not itself grant a separate project license.
+TavernDroid is licensed under GPL-3.0-only. The maintainer approved this choice with the P0 specification on 2026-10-11. The complete [LICENSE](../../LICENSE) is installed from the Free Software Foundation's [GPLv3 text](https://www.gnu.org/licenses/gpl-3.0.txt). Preserve the upstream grant and applicable notices when adapting material.
 
 ## Pinned upstream declaration
 
@@ -20,11 +20,11 @@ The local `D:\SillyTavern-Telegram-Bridge` checkout points to a different GitHub
 | assets/character-ranks | Upstream documents user-supplied assets but supplies no separate asset license grant; do not import them without an explicit permitted basis |
 | Android libraries and imported user content | Inventory the artifacts actually shipped and their licenses separately; Python dependency notices do not license Android replacements or character artwork |
 
-Notice source: [THIRD_PARTY_NOTICES.md](https://github.com/cepeter-job/SillyTavern-Telegram-Bridge/blob/38b17d10d7630baec9efe53320ca94f8ab122bda/THIRD_PARTY_NOTICES.md). No upstream code or artwork is copied in this P0 draft; the fixtures are hand-authored synthetic data. Rewriting code in Kotlin does not erase the need to review the applicable upstream grant.
+Notice source: [THIRD_PARTY_NOTICES.md](https://github.com/cepeter-job/SillyTavern-Telegram-Bridge/blob/38b17d10d7630baec9efe53320ca94f8ab122bda/THIRD_PARTY_NOTICES.md). No upstream code or artwork is copied in P0; the fixtures are hand-authored synthetic data. Rewriting code in Kotlin does not erase the need to review the applicable upstream grant.
 
 ## Before a port or release
 
-1. Approve the project license and add its complete text.
+1. Verify that the approved project license and complete text accompany the material.
 2. Record the source commit, path, reused scope and actual notices for each port.
 3. Retain the applicable license and copyright text and identify adaptations.
 4. Review licenses and provenance of bundled dependencies and assets.

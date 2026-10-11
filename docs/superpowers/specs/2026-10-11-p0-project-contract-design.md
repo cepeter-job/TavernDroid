@@ -1,6 +1,6 @@
 # TavernDroid P0 contract and P1 specification
 
-Status: draft for maintainer review, 2026-10-11. This specifies the first standalone Android foundation described in [roadmap issue 1](https://github.com/cepeter-job/TavernDroid/issues/1). It authorizes no provider calls or release distribution. P0 stays open until its decisions, physical reference device, and the subsequent implementation plan have been reviewed.
+Status: approved by the maintainer in chat on 2026-10-11, following review of draft commit fa31005. This specifies the first standalone Android foundation described in [roadmap issue 1](https://github.com/cepeter-job/TavernDroid/issues/1). It authorizes no provider calls or release distribution. The [P1 implementation plan](../plans/2026-10-11-p1-native-foundation.md) requires review before scaffolding. P0 remains open until the plan and physical reference device are finalized.
 
 ## Purpose and first acceptance example
 
@@ -8,17 +8,17 @@ Build a native Android roleplay app that owns characters, stories, operation rec
 
 The first P1 demonstration is: install a debug APK, create a character, start a story, send a message, receive a fake streamed reply, restart the process, and resume the saved conversation. It runs with airplane mode enabled and has no Internet permission. NanoGPT and OpenRouter belong to P2; full upstream parity belongs to later phases.
 
-## Decisions proposed for approval
+## Approved decisions
 
-| Decision | Proposal and reason |
+| Decision | Contract and reason |
 | --- | --- |
 | Runtime | Kotlin engine and Compose UI; one Android runtime with explicit lifecycle ownership |
 | Storage | Room canonical history, app-private files, DataStore non-secret preferences |
 | Scope | Four modules and P1 fake-provider flow; later phases retain their roadmap boundaries |
-| Minimum OS | Android 8.0, API 26; approve this floor before scaffolding |
+| Minimum OS | Android 8.0, API 26 |
 | Compile and target SDK | 37, using stable SDK package android-37.0 |
 | Application ID | io.github.cepeterjob.taverndroid, debug suffix .debug; freeze before alpha distribution |
-| License | GPL-3.0-only, subject to maintainer approval before installing LICENSE or porting material |
+| License | GPL-3.0-only; approved and installed in the root LICENSE |
 | Toolchain | AGP 9.1.1, Gradle 9.3.1, Kotlin/Compose compiler 2.4.21, Compose BOM 2026.09.00, JBR 25.0.3, bytecode target 17 |
 | Physical benchmark | Record an ARM64 phone's model, OS build and RAM; 4 GB is the roadmap baseline. An emulator cannot satisfy this decision |
 
@@ -47,7 +47,7 @@ The engine never imports Android, Room, SQL, HTTP adapters, or UI types. Contrac
 
 Stories and Characters are the working navigation destinations. Library and Settings have deliberate empty states; Settings supports theme selection and explains that the current build uses a fake provider. No credential-entry or connection-test UI appears before P2.
 
-A character has a required name and optional description and greeting. Proposed limits are 80, 16000 and 8000 UTF-16 code units respectively. Trim surrounding whitespace from the name and reject a blank name. Starting a session captures the character fields as a local snapshot; editing a global character must not change an existing session's greeting or description. P1 can omit character editing while preserving this data rule.
+A character has a required name and optional description and greeting. Limits are 80, 16000 and 8000 UTF-16 code units respectively. Trim surrounding whitespace from the name and reject a blank name. Starting a session captures the character fields as a local snapshot; editing a global character must not change an existing session's greeting or description. P1 can omit character editing while preserving this data rule.
 
 The story screen displays saved canonical turns separately from a streaming or saved unfinished draft. Free-text input has a 16000 UTF-16 code-unit limit and rejects blank input. Send is guarded while an operation is active; Stop cancels it. Failed, cancelled and interrupted attempts expose explicit Retry and, when a draft exists, Discard draft actions. P1 renders text safely without HTML, scripts, or executable imported content; advanced narrative formatting is deferred to its tested port.
 
@@ -107,13 +107,13 @@ These are proposed release gates, not P0 measurements or emulator results. If th
 
 | Requirement | Current evidence or remaining action |
 | --- | --- |
-| Architectural direction and exclusions | This draft; maintainer review required |
+| Architectural direction and exclusions | Approved in chat on 2026-10-11 |
 | README identity | Standalone TavernDroid wording with accurate pre-implementation status |
-| License and attribution | Pinned evidence and GPL-3.0-only proposal; install LICENSE only after approval |
+| License and attribution | Approved GPL-3.0-only grant, complete root LICENSE, and pinned provenance review |
 | Contribution and security policy | Local policies; verify private security-reporting route before P2 |
 | Parity and dependencies | Pinned source/test matrix, direct dependency review, complete runtime lock inventory, synthetic fixtures |
-| Stable toolchain and Windows setup | Exact proposed pins, installed SDK evidence; real build belongs to P1 |
-| Device and import boundaries | API 26 floor and manual-only P1 scope proposed; physical reference awaiting maintainer selection |
-| Written implementation plan | Create after written-spec approval; review and select execution method before scaffolding |
+| Stable toolchain and Windows setup | Approved exact pins and installed SDK evidence; real build belongs to P1 |
+| Device and import boundaries | API 26 floor and manual-only P1 scope approved; physical reference awaiting maintainer selection |
+| Written implementation plan | Prepared after spec approval; review and select execution method before scaffolding |
 
-Review the decisions table first. Approval accepts this scoped specification, not the entire P0 through P6 roadmap as one implementation. Then write the focused P1 implementation plan, finalize the reference-device entry, and close P0 only when its exit evidence is complete. GitHub issue checkboxes remain unchanged during draft review.
+The maintainer approved this scoped specification in chat. Review the prepared P1 implementation plan and finalize the reference-device entry before closing P0. This approval does not authorize the entire P0 through P6 roadmap as one implementation. GitHub issue checkboxes remain unchanged while the remaining exit evidence is pending.

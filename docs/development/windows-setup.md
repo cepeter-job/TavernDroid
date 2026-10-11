@@ -2,9 +2,9 @@
 
 Use the Windows checkout at `D:\TavernDroid` and Windows Gradle caches. Android Studio Rabbit 1 is installed at `D:\Android\AndroidStudio`; its bundled Java runtime is at `D:\Android\AndroidStudio\jbr`. The SDK is at `D:\Android\Sdk` and virtual devices are at `D:\Android\Avd`.
 
-## Toolchain proposed for approval
+## Approved toolchain
 
-[toolchain.json](toolchain.json) records the exact P0 pins. P1 must copy them into its version catalog and wrapper and verify a real build before claiming build compatibility.
+[toolchain.json](toolchain.json) records the exact P0 pins approved on 2026-10-11. P1 must copy them into its version catalog and wrapper and verify a real build before claiming build compatibility.
 
 | Component | Version |
 | --- | --- |
@@ -17,7 +17,7 @@ Use the Windows checkout at `D:\TavernDroid` and Windows Gradle caches. Android 
 | JVM bytecode target | 17 |
 | Compile and target SDK | 37, platform package android-37.0 |
 | Build Tools | 36.0.0 |
-| Proposed minimum SDK | 26, Android 8.0 |
+| Minimum SDK | 26, Android 8.0 |
 
 AGP 9.1.1 explicitly supports API 37 and requires Gradle 9.3.1 and Build Tools 36.0.0. Both chosen build versions are inside Kotlin 2.4.21's published compatibility range. Gradle 9.3.1 supports Java 25; the application bytecode target remains 17. Sources: [AGP](https://developer.android.com/build/releases/agp-9-1-0-release-notes), [Kotlin](https://kotlinlang.org/docs/gradle-configure-project.html), [Gradle Java](https://docs.gradle.org/current/userguide/compatibility.html).
 
@@ -54,12 +54,12 @@ Installed packages include SDK command-line tools 22.0, platform 37.0 revision 2
 | Pixel 7 API 37 emulator | Current API instrumentation and local development in P1 |
 | ARM64 physical phone with 4 GB RAM baseline | Release startup, PSS, scrolling and interruption benchmarks; model and OS require maintainer selection |
 
-Android 8.0 through Android 17 is the proposed OS range, subject to minSdk approval and actual tests. ARM64 hardware is the release benchmark baseline; the current app design has no native inference runtime. Tablets, foldables, and vendor-specific background behavior require separate evidence before compatibility claims.
+Android 8.0 through Android 17 is the approved target OS range; compatibility claims require actual tests. ARM64 hardware is the release benchmark baseline; the current app design has no native inference runtime. Tablets, foldables, and vendor-specific background behavior require separate evidence before compatibility claims.
 
 Do not use the API 37 emulator as physical performance evidence. Physical reference selection remains a P0 exit requirement. In WSL, use a separate Linux checkout and caches for optional reference tooling; do not concurrently build or mutate the Windows checkout. See [Microsoft filesystem guidance](https://learn.microsoft.com/en-us/windows/wsl/filesystems).
 
 ## Signing and updates
 
-Proposed release application ID: `io.github.cepeterjob.taverndroid`; debug builds append `.debug`. Freeze the release ID before distributing an alpha. Debug and release credentials and data remain separate.
+Approved release application ID: `io.github.cepeterjob.taverndroid`; debug builds append `.debug`. Freeze the release ID before distributing an alpha. Debug and release credentials and data remain separate.
 
 P1 uses Android's local debug signing identity. Create the independent release signing key only when a release is being prepared; keep it outside Git, retain controlled offline backups, and record its certificate fingerprint with release provenance. Keep one certificate and increasing version codes for in-place upgrades. Untrusted PR workflows receive no release key. App-private data retention across upgrades requires device tests.

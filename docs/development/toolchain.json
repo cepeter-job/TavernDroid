@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "proposed-for-review",
+  "status": "spec-approved-2026-10-11",
   "androidStudio": { "distributionVersion": "2026.2.1.8", "release": "Rabbit 1" },
   "agp": "9.1.1",
   "gradle": "9.3.1",

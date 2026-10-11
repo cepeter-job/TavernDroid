@@ -1,6 +1,6 @@
 # Contributing to TavernDroid
 
-TavernDroid is a standalone Android application. Changes must preserve local ownership of content and stories and the absence of a required server. P0 proposals are under review; application scaffolding begins after the written specification and implementation plan are approved.
+TavernDroid is a standalone Android application. Changes must preserve local ownership of content and stories and the absence of a required server. The P0 specification is approved; the P1 implementation plan requires review before application scaffolding begins.
 
 ## Before a change
 
@@ -10,7 +10,7 @@ TavernDroid is a standalone Android application. Changes must preserve local own
 4. Record the pinned upstream source and applicable notices for reused material.
 5. Implement a focused change and provide actual test results in its pull request.
 
-Do not include private stories, databases, provider credentials, signing keys, or environment files. Use synthetic examples. The proposed project license is GPL-3.0-only; do not port upstream material until the maintainer approves and installs the project license.
+Do not include private stories, databases, provider credentials, signing keys, or environment files. Use synthetic examples. Contributions are licensed under GPL-3.0-only; preserve provenance and applicable notices on upstream adaptations.
 
 ## Design and tests
 

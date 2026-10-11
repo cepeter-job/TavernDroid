@@ -6,16 +6,16 @@ No VPS, Telegram bot, SillyTavern server, or embedded Python runtime is required
 
 ## Project status
 
-P0 is in design review. There is no application source or installable APK yet. The first implementation will be P1's offline flow: create a character, start a story, receive a fake streamed reply, and recover the saved conversation after restart.
+The P0 specification is approved. P1's implementation plan is awaiting review, and the physical benchmark phone remains to be selected. There is no application source or installable APK yet. The first implementation will be P1's offline flow: create a character, start a story, receive a fake streamed reply, and recover the saved conversation after restart.
 
 | Read next | Purpose |
 | --- | --- |
-| [P0 project contract and P1 specification](docs/superpowers/specs/2026-10-11-p0-project-contract-design.md) | Proposed decisions and acceptance requirements |
+| [Approved specification](docs/superpowers/specs/2026-10-11-p0-project-contract-design.md) and [P1 plan](docs/superpowers/plans/2026-10-11-p1-native-foundation.md) | Accepted decisions and implementation plan awaiting review |
 | [Windows development](docs/development/windows-setup.md) | Installed tools, exact pins, and device matrix |
 | [Upstream parity](docs/provenance/parity-matrix.md) | Pinned behaviors, source paths, and test contracts |
-| [Licensing and provenance](docs/provenance/licensing.md) | Proposed license and reuse rules |
+| [Licensing and provenance](docs/provenance/licensing.md) | Approved license and reuse rules |
 | [Roadmap issue](https://github.com/cepeter-job/TavernDroid/issues/1) | P0 through P7 delivery boundaries |
 
 ## Contribution and security
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing implementation changes and [SECURITY.md](SECURITY.md) before reporting a vulnerability. The GPLv3 licensing proposal requires maintainer approval before upstream material is ported; see the provenance review. This repository does not yet grant a separate project license.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing implementation changes and [SECURITY.md](SECURITY.md) before reporting a vulnerability. TavernDroid is licensed under [GPL-3.0-only](LICENSE); see the provenance review for upstream attribution and reuse requirements.

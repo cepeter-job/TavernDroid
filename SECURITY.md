@@ -1,6 +1,6 @@
 # TavernDroid security policy
 
-TavernDroid is in design review and has no released APK or supported release branch. Security requirements apply before real provider credentials or private story data enter an implementation.
+TavernDroid is awaiting implementation-plan review and has no released APK or supported release branch. Security requirements apply before real provider credentials or private story data enter an implementation.
 
 ## Reporting a vulnerability
 
