@@ -6,7 +6,7 @@ The P1 debug build works offline with deterministic synthetic replies. Create a 
 
 ## Project status
 
-The P0 specification and P1 plan are approved. Native P1 has passed local Android 8/17 delivery checks and is undergoing final branch review. The physical benchmark phone remains to be selected. This build has no network permission or credential-entry UI; real providers are scheduled for P2.
+The P0 specification and P1 plan are approved. All five native P1 implementation tasks and local Android 8/17 checks are complete; the three findings from final branch review are fixed and covered by regressions. The physical benchmark phone remains to be selected. This build has no network permission or credential-entry UI; real providers are scheduled for P2.
 
 With the approved JDK and SDK installed, run `.\gradlew.bat :app:assembleDebug`. Install `app/build/outputs/apk/debug/app-debug.apk` on Android 8.0 or newer.
 

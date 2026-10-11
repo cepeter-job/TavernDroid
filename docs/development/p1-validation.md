@@ -31,9 +31,9 @@ Observed 2026-10-12 local results:
 
 | Check | Actual result |
 | --- | --- |
-| JVM contracts | 30 passed: engine 13, providers 3, app 14; storage JVM task has no tests |
-| API 26 connected | 25 storage + 8 app passed; 2 host-only entry points skipped |
-| API 37 connected | 25 storage + 8 app passed; 2 host-only entry points skipped |
+| JVM contracts | 34 passed: engine 13, providers 3, app 18; storage JVM task has no tests |
+| API 26 connected | 27 storage + 9 app passed; 2 host-only entry points skipped |
+| API 37 connected | 27 storage + 9 app passed; 2 host-only entry points skipped |
 | Host SIGKILL/relaunch | Queued, Streaming and Completed passed on both APIs; 6 independent verifications |
 | Offline flow | API 37 airplane mode enabled: create/send/reopen passed; radio setting restored |
 | Integrity, lint, packaging | Approved wrapper accepted, four tampered fixtures rejected; ktlint/build pass; lint 0 errors and 3 version advisories |
@@ -42,7 +42,9 @@ The API 26 host script initially failed because `run-as` cannot execute the shel
 builtin `test`; reading the readiness file with `cat` fixed the host probe, and
 all three cases passed. This was not an Android recovery failure. Android Gradle
 Plugin's console prints 12 completions for the app when two assumptions skip;
-the authoritative XML has 10 tests, 2 skipped, 0 failures: 8 actual passes.
+the original XML had 10 tests, 2 skipped, 0 failures: 8 actual passes. After the
+review regression was added, XML has 11 tests, 2 skipped, 0 failures: 9 passes;
+the console similarly prints 13 completions. Counts above use XML.
 
 Devices: `TavernDroid_API26`, Android 8.0.0, x86_64,
 `Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys`;
@@ -51,10 +53,13 @@ Devices: `TavernDroid_API26`, Android 8.0.0, x86_64,
 Both use 2 GB emulated RAM with Windows WHPX, not the physical ARM64 benchmark baseline.
 
 Debug APK SHA256:
-`98e7c720f72a2afa5f09b02629e1df39b9b1aa847c69c62bbd459cee804b433c`.
-Tested implementation revision: `8b003f34169d185b365b71753ffde3bc6cb500f6`
+`2fb46fa29e16f639f34d04b0cbbbaca04ddc6990caf39908df0541b56f0618db`.
+Tested implementation revision: `779dfa83a0aa046c59e8cc4c72ef000f558f549f`
 on `feat/p1-native-foundation`. Documentation updates do not change the APK.
-Final review status and any corrections accompany the exported validation report.
+The [fresh branch review and corrections](p1-review.md) record three Important
+findings, all fixed with observed failing regressions and a passing full matrix.
+No Critical or Minor findings were raised. Hosted CI and physical release gates
+remain open as described below.
 
 The real Room suite covers atomic admission/completion rollback, global admission,
 first-terminal wins, stale operation identity, duplicate client commands, retry
