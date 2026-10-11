@@ -20,9 +20,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Verify wrapper integrity and rejection contracts
+      - name: Verify wrapper integrity and CI exit contracts
         shell: pwsh
-        run: ./tools/tests/verify-wrapper.tests.ps1
+        run: ./tools/tests/ci-entrypoints.tests.ps1
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -31,7 +31,11 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: Install SDK packages
-        run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
+        run: |
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          sdkmanager --version
+          sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
       - name: JVM, formatting, lint and debug APK
         run: >-
           ./gradlew :engine:test :providers:test :storage:testDebugUnitTest
@@ -88,6 +92,10 @@ jobs:
         env:
           IMAGE: ${{ matrix.image }}
         run: |
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          sdkmanager --version
           test -e /dev/kvm
           sudo chmod a+rw /dev/kvm
           sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'platform-tools' 'emulator' "system-images;$IMAGE;google_apis;x86_64"

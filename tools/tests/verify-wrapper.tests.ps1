@@ -34,3 +34,5 @@ try {
     }
     Remove-Item -LiteralPath $resolved -Recurse -Force
 }
+# Expected rejection subprocesses must not become the runner's final status.
+exit 0
