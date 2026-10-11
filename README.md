@@ -1,16 +1,18 @@
 # TavernDroid
 
-TavernDroid is a planned standalone Android roleplay application with a native Kotlin engine and Jetpack Compose interface. Characters, stories, and memory stay on the device. Cloud generation connects directly to the user's chosen provider.
+TavernDroid is a standalone Android roleplay application with a native Kotlin engine and Jetpack Compose interface. Characters and stories stay on the device.
 
-No VPS, Telegram bot, SillyTavern server, or embedded Python runtime is required. Reading and editing local content work offline; cloud generation needs connectivity and a provider credential.
+The P1 debug build works offline with deterministic synthetic replies. Create a character, start a story, and send a message. Stop and backgrounding preserve unfinished drafts; restarting requires explicit Retry. Settings supports system, light and dark themes.
 
 ## Project status
 
-The P0 specification is approved. P1's implementation plan is awaiting review, and the physical benchmark phone remains to be selected. There is no application source or installable APK yet. The first implementation will be P1's offline flow: create a character, start a story, receive a fake streamed reply, and recover the saved conversation after restart.
+The P0 specification and P1 plan are approved. P1 implementation is undergoing final delivery checks. The physical benchmark phone remains to be selected. This build has no network permission or credential-entry UI; real providers are scheduled for P2.
+
+With the approved JDK and SDK installed, run `.\gradlew.bat :app:assembleDebug`. Install `app/build/outputs/apk/debug/app-debug.apk` on Android 8.0 or newer.
 
 | Read next | Purpose |
 | --- | --- |
-| [Approved specification](docs/superpowers/specs/2026-10-11-p0-project-contract-design.md) and [P1 plan](docs/superpowers/plans/2026-10-11-p1-native-foundation.md) | Accepted decisions and implementation plan awaiting review |
+| [Approved specification](docs/superpowers/specs/2026-10-11-p0-project-contract-design.md) and [P1 plan](docs/superpowers/plans/2026-10-11-p1-native-foundation.md) | Accepted decisions and approved implementation plan |
 | [Windows development](docs/development/windows-setup.md) | Installed tools, exact pins, and device matrix |
 | [Upstream parity](docs/provenance/parity-matrix.md) | Pinned behaviors, source paths, and test contracts |
 | [Licensing and provenance](docs/provenance/licensing.md) | Approved license and reuse rules |

@@ -12,7 +12,7 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "0.1.0-dev"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "io.github.cepeterjob.taverndroid.TavernTestRunner"
     }
     buildTypes {
         debug { applicationIdSuffix = ".debug" }
@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":engine"))
     implementation(project(":storage"))
     implementation(project(":providers"))
+    implementation(libs.room.runtime)
     implementation(libs.coroutines.android)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
