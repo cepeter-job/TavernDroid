@@ -1,6 +1,6 @@
 # TavernDroid security policy
 
-TavernDroid is awaiting implementation-plan review and has no released APK or supported release branch. Security requirements apply before real provider credentials or private story data enter an implementation.
+TavernDroid has an offline, fake-provider debug implementation and no supported release branch. The debug APK has no Internet permission or credential-entry UI. Keystore tests use synthetic credentials; see [validation](docs/development/p1-validation.md) for tested boundaries and remaining device-transfer checks.
 
 ## Reporting a vulnerability
 

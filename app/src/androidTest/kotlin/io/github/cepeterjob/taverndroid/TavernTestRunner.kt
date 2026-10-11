@@ -9,6 +9,7 @@ import io.github.cepeterjob.taverndroid.providers.FakeStreamingProvider
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 
 class TavernTestRunner : AndroidJUnitRunner() {
@@ -24,6 +25,10 @@ class TestApplication : TavernDroidApplication() {
                 invocations.incrementAndGet()
                 if (holdStream) {
                     emit("synthetic partial draft")
+                    if (checkpointStream) {
+                        delay(1200)
+                        emit(" checkpoint")
+                    }
                     awaitCancellation()
                 } else {
                     FakeStreamingProvider().stream(snapshot).collect { emit(it) }
@@ -37,5 +42,7 @@ class TestApplication : TavernDroidApplication() {
         val invocations = AtomicInteger()
 
         @Volatile var holdStream = false
+
+        @Volatile var checkpointStream = false
     }
 }

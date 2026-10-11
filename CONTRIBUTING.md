@@ -1,6 +1,6 @@
 # Contributing to TavernDroid
 
-TavernDroid is a standalone Android application. Changes must preserve local ownership of content and stories and the absence of a required server. The P0 specification is approved; the P1 implementation plan requires review before application scaffolding begins.
+TavernDroid is a standalone Android application. Changes must preserve local ownership of content and stories and the absence of a required server. The P0 specification and native P1 plan are approved. The offline debug implementation is available on the development branch; see [validation](docs/development/p1-validation.md) for measured checks and remaining release gates.
 
 ## Before a change
 
@@ -16,7 +16,7 @@ Do not include private stories, databases, provider credentials, signing keys, o
 
 Use constructor injection, readable Kotlin, and the four module boundaries in the specification. Keep business behavior out of composables and SQL out of the engine. Add tests for significant logic at its public boundary. Android lifecycle, Keystore, storage, and screen geometry need Android tests; a JVM test alone cannot establish their behavior.
 
-Use the checked-in Gradle wrapper once P1 creates it. Every pull request must identify the module and variant checked, commands run, results, and any unavailable device check. Normal PR checks must run without paid provider credentials.
+Verify the checked-in Gradle wrapper with `pwsh -File tools/verify-wrapper.ps1` before running it. Every pull request must identify the module and variant checked, commands run, results, and any unavailable device check. Normal PR checks run without paid provider credentials.
 
 ## Reviews and releases
 
