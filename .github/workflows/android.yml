@@ -102,8 +102,12 @@ jobs:
           "$ANDROID_HOME/emulator/emulator" -accel-check
           echo no | avdmanager create avd -n p1 -k "system-images;$IMAGE;google_apis;x86_64" --device pixel_2
           "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu swiftshader -memory 2048 -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          emulator_pid=$!
           trap 'adb -s emulator-5554 emu kill || true' EXIT
-          timeout 600 bash -c 'until [ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" = 1 ]; do sleep 2; done'
+          if ! timeout 600 bash -c 'until [ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" = 1 ]; do kill -0 "$1" 2>/dev/null || exit 1; sleep 2; done' _ "$emulator_pid"; then
+            cat "$RUNNER_TEMP/emulator.log"
+            exit 1
+          fi
           adb -s emulator-5554 shell input keyevent 82
           ./gradlew :storage:connectedDebugAndroidTest :app:connectedDebugAndroidTest :app:assembleDebug :app:assembleDebugAndroidTest
           pwsh -NoProfile -File tools/verify-process-recovery.ps1 -DeviceSerial emulator-5554 -DebugApk app/build/outputs/apk/debug/app-debug.apk -TestApk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
@@ -117,3 +121,4 @@ jobs:
             */build/reports/androidTests/**
             build/recovery-reports/*-seed*.txt
             build/recovery-reports/*-verify.txt
+            ${{ runner.temp }}/emulator.log
