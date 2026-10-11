@@ -8,7 +8,7 @@
 
 **Tech Stack:** Approved Kotlin 2.4.21, AGP 9.1.1, Gradle 9.3.1, Java runtime 25 with bytecode target 17, Compose BOM 2026.09.00, Room/KSP2, coroutines, DataStore, Android Keystore and JUnit.
 
-**Spec:** [Approved P0 contract and P1 specification](../specs/2026-10-11-p0-project-contract-design.md), approved in chat on 2026-10-11. This plan is pending review and execution-method selection. No application code has been scaffolded.
+**Spec:** [Approved P0 contract and P1 specification](../specs/2026-10-11-p0-project-contract-design.md), approved in chat on 2026-10-11. The maintainer approved this plan and Native execution in chat on 2026-10-11. Implementation proceeds in the managed taverndroid-p1 worktree on feat/p1-native-foundation.
 
 ## Global Constraints
 
@@ -286,6 +286,6 @@ Reference guidance: [Android command-line tests](https://developer.android.com/s
 
 ## Review and execution handoff
 
-Approve this plan before creating the app modules or installing its product dependencies. Native execution is recommended: the five tasks share the operation/storage interfaces closely, so one implementer can integrate them coherently while independent investigations and final review remain useful. Subagent-driven execution is also supported, with separate implementation/review contexts per task. The maintainer's standing request for independent investigations applies in either method.
+Plan approval and Native execution were confirmed by the maintainer in chat on 2026-10-11. The five tasks share the operation/storage interfaces closely; one implementer integrates them while independent investigations and final review remain useful. The maintainer's standing request for independent investigations still applies.
 
 Physical reference selection is still open: record the actual ARM64 phone model, Android build and RAM, and whether it meets or intentionally differs from the 4 GB baseline. This does not invalidate the approved API floor or prevent preparation of the emulator-tested P1 work, but P0 and physical release benchmarks cannot be marked complete without that decision.

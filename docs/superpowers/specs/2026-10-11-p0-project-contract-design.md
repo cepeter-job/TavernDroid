@@ -1,6 +1,6 @@
 # TavernDroid P0 contract and P1 specification
 
-Status: approved by the maintainer in chat on 2026-10-11, following review of draft commit fa31005. This specifies the first standalone Android foundation described in [roadmap issue 1](https://github.com/cepeter-job/TavernDroid/issues/1). It authorizes no provider calls or release distribution. The [P1 implementation plan](../plans/2026-10-11-p1-native-foundation.md) requires review before scaffolding. P0 remains open until the plan and physical reference device are finalized.
+Status: approved by the maintainer in chat on 2026-10-11, following review of draft commit fa31005. This specifies the first standalone Android foundation described in [roadmap issue 1](https://github.com/cepeter-job/TavernDroid/issues/1). It authorizes no provider calls or release distribution. The [P1 implementation plan](../plans/2026-10-11-p1-native-foundation.md) and Native execution were subsequently approved in chat. P0 remains open until the physical reference device is finalized.
 
 ## Purpose and first acceptance example
 
@@ -114,6 +114,6 @@ These are proposed release gates, not P0 measurements or emulator results. If th
 | Parity and dependencies | Pinned source/test matrix, direct dependency review, complete runtime lock inventory, synthetic fixtures |
 | Stable toolchain and Windows setup | Approved exact pins and installed SDK evidence; real build belongs to P1 |
 | Device and import boundaries | API 26 floor and manual-only P1 scope approved; physical reference awaiting maintainer selection |
-| Written implementation plan | Prepared after spec approval; review and select execution method before scaffolding |
+| Written implementation plan | Approved in chat on 2026-10-11; Native execution selected |
 
-The maintainer approved this scoped specification in chat. Review the prepared P1 implementation plan and finalize the reference-device entry before closing P0. This approval does not authorize the entire P0 through P6 roadmap as one implementation. GitHub issue checkboxes remain unchanged while the remaining exit evidence is pending.
+The maintainer approved this scoped specification and the focused P1 plan in chat. Finalize the reference-device entry before closing P0. This approval does not authorize the entire P0 through P6 roadmap as one implementation. GitHub issue checkboxes remain unchanged while the remaining exit evidence is pending.
