@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "invalid-choice-shape-preserves-story",
+  "authorship": "hand-authored synthetic target contract",
+  "upstreamCommit": "38b17d10d7630baec9efe53320ca94f8ab122bda",
+  "input": { "requestedChoiceCount": 3, "providerChoices": ["Open the door.", "Open the door."], "canonicalReplyAlreadySaved": true },
+  "expected": { "choicesAvailable": false, "canonicalReplyStillSaved": true, "explicitChoiceRetryAvailable": true },
+  "plannedPhase": "P3"
+}
