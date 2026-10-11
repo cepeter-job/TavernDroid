@@ -30,4 +30,10 @@ interface StoryDao {
 
     @Query("SELECT * FROM turns WHERE sessionId = :sessionId ORDER BY ordinal")
     suspend fun readTurns(sessionId: String): List<TurnEntity>
+
+    @Query("UPDATE sessions SET revision = revision + 1 WHERE id = :id")
+    suspend fun advanceRevision(id: String): Int
+
+    @Query("SELECT * FROM turns WHERE id = :id")
+    suspend fun turn(id: String): TurnEntity?
 }
