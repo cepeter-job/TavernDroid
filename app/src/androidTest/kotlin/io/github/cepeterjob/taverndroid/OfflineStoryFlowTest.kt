@@ -1,5 +1,6 @@
 package io.github.cepeterjob.taverndroid
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -9,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -24,7 +26,8 @@ class OfflineStoryFlowTest {
         compose.onNodeWithTag("character-name").performTextInput("Synthetic Ada")
         compose.onNodeWithTag("character-greeting").performTextInput("Welcome synthetic reader")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
-        compose.onNodeWithText("Save character").performScrollTo().performClick()
+        compose.onNodeWithText("Save character").performScrollTo()
+            .performSemanticsAction(SemanticsActions.OnClick) { it() }
         val container = (compose.activity.application as TavernDroidApplication).container
         var characterId: String? = null
         compose.waitUntil(10000) {
@@ -42,7 +45,8 @@ class OfflineStoryFlowTest {
         compose.onNodeWithText("Welcome synthetic reader").assertIsDisplayed()
         compose.onNodeWithTag("message").performTextInput("Hello")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
-        compose.onNodeWithText("Send", substring = false).assertIsDisplayed().performClick()
+        compose.onNodeWithText("Send", substring = false).assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick) { it() }
         compose.waitUntil(10000) {
             compose.onAllNodes(androidx.compose.ui.test.hasText("Synthetic reply: Hello"))
                 .fetchSemanticsNodes().size == 1

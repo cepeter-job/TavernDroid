@@ -1,11 +1,13 @@
 package io.github.cepeterjob.taverndroid
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.Lifecycle
 import io.github.cepeterjob.taverndroid.engine.CharacterInput
@@ -40,7 +42,7 @@ class ForegroundLifecycleTest {
         }
         compose.onNodeWithTag("open-$sessionId").performScrollTo().performClick()
         compose.onNodeWithTag("message").performTextInput("Synthetic lifecycle message")
-        compose.onNodeWithText("Send").performClick()
+        compose.onNodeWithText("Send").performSemanticsAction(SemanticsActions.OnClick) { it() }
         compose.waitUntil(10000) { TestApplication.invocations.get() == 1 }
         compose.waitUntil(10000) {
             compose.onAllNodes(
