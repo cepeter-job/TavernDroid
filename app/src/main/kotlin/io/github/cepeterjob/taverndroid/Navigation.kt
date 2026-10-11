@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -28,6 +31,7 @@ import io.github.cepeterjob.taverndroid.characters.CharactersViewModel
 import io.github.cepeterjob.taverndroid.engine.ThemeChoice
 import io.github.cepeterjob.taverndroid.library.LibraryScreen
 import io.github.cepeterjob.taverndroid.settings.SettingsScreen
+import io.github.cepeterjob.taverndroid.settings.SettingsViewModel
 import io.github.cepeterjob.taverndroid.stories.StoriesScreen
 import io.github.cepeterjob.taverndroid.stories.StoryScreen
 import io.github.cepeterjob.taverndroid.stories.StoryViewModel
@@ -42,8 +46,11 @@ fun TavernNavigation(container: AppContainer) {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
     TavernTheme(theme) {
-        Scaffold(contentWindowInsets = WindowInsets.safeDrawing, bottomBar = {
+        Scaffold(snackbarHost = {
+            SnackbarHost(snackbar)
+        }, contentWindowInsets = WindowInsets.safeDrawing, bottomBar = {
             if (entry?.destination?.route != "story/{id}") {
                 NavigationBar {
                     listOf("Stories", "Characters", "Library", "Settings").forEach { label ->
@@ -80,8 +87,14 @@ fun TavernNavigation(container: AppContainer) {
                         CharactersScreen(model) { id ->
                             focus.clearFocus()
                             scope.launch {
-                                val session = container.repository.startSession(id)
-                                nav.navigate("story/${session.identity.sessionId}")
+                                val sessionId = model.startStory(id)
+                                if (sessionId != null) {
+                                    nav.navigate("story/$sessionId")
+                                } else {
+                                    snackbar.showSnackbar(
+                                        model.error.value ?: "Could not start story. Try again."
+                                    )
+                                }
                             }
                         }
                     }
@@ -103,8 +116,14 @@ fun TavernNavigation(container: AppContainer) {
                     }
                     composable("library") { LibraryScreen() }
                     composable("settings") {
-                        SettingsScreen(theme) {
-                            scope.launch { container.preferences.setTheme(it) }
+                        val model: SettingsViewModel = viewModel(
+                            factory = viewModelFactory {
+                                initializer { SettingsViewModel(container.preferences) }
+                            }
+                        )
+                        val error by model.error.collectAsStateWithLifecycle()
+                        SettingsScreen(theme, error) {
+                            scope.launch { model.setTheme(it) }
                         }
                     }
                 }

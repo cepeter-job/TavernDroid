@@ -1,6 +1,7 @@
 package io.github.cepeterjob.taverndroid.storage
 
 import android.content.Context
+import android.util.AtomicFile
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.cepeterjob.taverndroid.engine.CredentialRead
 import io.github.cepeterjob.taverndroid.engine.ReentryReason
@@ -120,5 +121,31 @@ class KeystoreCredentialStoreTest {
             file.parentFile!!.canonicalPath
         )
         assertEquals(CredentialRead.Available("synthetic-canary"), credentials.read(profile))
+    }
+
+    @Test fun interruptedReplacementKeepsLastCommittedCredential() = runTest {
+        credentials.put("profile", "synthetic-committed")
+        val atomic = AtomicFile(paths.credentialFile(alias, "profile"))
+        val unfinished = atomic.startWrite()
+        try {
+            unfinished.write(byteArrayOf(0, 1, 2))
+            unfinished.flush()
+            // Close the descriptor without finishWrite/failWrite, as process death would.
+            unfinished.close()
+            val reopened = KeystoreCredentialStore(context, alias)
+            assertEquals(CredentialRead.Available("synthetic-committed"), reopened.read("profile"))
+        } finally {
+            atomic.failWrite(unfinished)
+        }
+    }
+
+    @Test fun legacyBackupWithoutBaseRecoversCommittedCredential() = runTest {
+        credentials.put("profile", "synthetic-committed")
+        val file = paths.credentialFile(alias, "profile")
+        val backup = java.io.File(file.path + ".bak")
+        check(file.renameTo(backup))
+        val reopened = KeystoreCredentialStore(context, alias)
+        assertEquals(CredentialRead.Available("synthetic-committed"), reopened.read("profile"))
+        assertEquals(CredentialRead.Available("synthetic-committed"), reopened.read("profile"))
     }
 }

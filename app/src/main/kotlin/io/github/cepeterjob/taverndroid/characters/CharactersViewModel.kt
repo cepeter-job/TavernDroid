@@ -15,6 +15,16 @@ class CharactersViewModel(private val repository: StoryRepository) : ViewModel()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     private val message = MutableStateFlow<String?>(null)
     val error = message
+    suspend fun startStory(characterId: String): String? = try {
+        val session = repository.startSession(characterId)
+        message.value = null
+        session.identity.sessionId
+    } catch (failure: Exception) {
+        if (failure is CancellationException) throw failure
+        message.value = "Could not start story. Try again."
+        null
+    }
+
     suspend fun create(input: CharacterInput): Boolean = try {
         repository.createCharacter(input)
         message.value = null

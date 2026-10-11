@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.dp
 import io.github.cepeterjob.taverndroid.engine.ThemeChoice
 
 @Composable
-fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit) {
+fun SettingsScreen(theme: ThemeChoice, error: String? = null, onTheme: (ThemeChoice) -> Unit) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
         Text("Appearance", style = MaterialTheme.typography.titleLarge)
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         ThemeChoice.entries.forEach { choice ->
             Row(
                 Modifier.fillMaxWidth().heightIn(min = 48.dp)

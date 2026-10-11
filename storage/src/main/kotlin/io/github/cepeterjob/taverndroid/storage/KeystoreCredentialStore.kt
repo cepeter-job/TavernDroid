@@ -7,6 +7,7 @@ import android.util.AtomicFile
 import io.github.cepeterjob.taverndroid.engine.CredentialRead
 import io.github.cepeterjob.taverndroid.engine.CredentialStore
 import io.github.cepeterjob.taverndroid.engine.ReentryReason
+import java.io.FileNotFoundException
 import java.security.GeneralSecurityException
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -61,7 +62,12 @@ class KeystoreCredentialStore(
     override suspend fun read(profileId: String): CredentialRead = withContext(dispatcher) {
         mutex.withLock {
             val file = paths.credentialFile(keyAlias, profileId)
-            if (!file.exists()) return@withLock CredentialRead.Absent
+            val blob = try {
+                // Recover a previously committed ciphertext after an interrupted replacement.
+                AtomicFile(file).readFully()
+            } catch (_: FileNotFoundException) {
+                return@withLock CredentialRead.Absent
+            }
             val key = try {
                 readKey()
             } catch (_: GeneralSecurityException) {
@@ -69,7 +75,6 @@ class KeystoreCredentialStore(
             }
                 ?: return@withLock CredentialRead.NeedsReentry(ReentryReason.UnavailableKey)
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            val blob = file.readBytes()
             if (blob.size < 33 ||
                 !blob.take(4).toByteArray().contentEquals(byteArrayOf(84, 68, 67, 1)) ||
                 blob[4].toInt() != 12
