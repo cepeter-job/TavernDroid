@@ -1,0 +1,179 @@
+name: Native Android contracts
+
+on:
+  push:
+    branches: [main]
+    tags: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Redacted full-history secret scan
+        run: |
+          curl --fail --location --output "$RUNNER_TEMP/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  '"$RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git --redact --exit-code 1
+      - name: Verify wrapper integrity and CI exit contracts
+        shell: pwsh
+        run: ./tools/tests/ci-entrypoints.tests.ps1
+      - name: Verify diagnostic cleanup exit contract
+        run: bash tools/tests/ci-device-diagnostics.tests.sh
+      - name: Verify navigation stability contracts
+        run: bash tools/tests/ci-navigation.tests.sh
+      - name: Verify renderer smoke contracts
+        run: bash tools/tests/ci-renderer.tests.sh
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 25.0.3
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-read-only: >-
+            ${{ github.event_name == 'pull_request' &&
+                github.event.pull_request.head.repo.full_name != github.repository }}
+      - name: Install SDK packages
+        run: |
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          sdkmanager --version
+          sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
+      - name: JVM, formatting, lint and debug APK
+        id: gradle-build
+        run: >-
+          ./gradlew :engine:test :providers:test :storage:testDebugUnitTest
+          :app:testDebugUnitTest ktlintCheck :storage:lintDebug :app:lintDebug
+          :app:assembleDebug :app:assembleDebugAndroidTest
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always() && steps.gradle-build.outcome != 'skipped'
+        with:
+          name: native-debug-and-build-reports
+          if-no-files-found: ${{ steps.gradle-build.outcome == 'success' && 'error' || 'warn' }}
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            */build/test-results/**/*.xml
+            */build/reports/tests/**
+            */build/reports/lint-results-debug.*
+            */build/reports/ktlint/**
+
+  device:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [26, 37]
+        include:
+          - api: 26
+            image: android-26
+            memory: 2048
+            gpu: swiftshader
+          - api: 37
+            image: android-37.0
+            memory: 4096
+            gpu: software
+    env:
+      ANDROID_SERIAL: emulator-5554
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify wrapper integrity
+        shell: pwsh
+        run: ./tools/verify-wrapper.ps1
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 25.0.3
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-read-only: >-
+            ${{ github.event_name == 'pull_request' &&
+                github.event.pull_request.head.repo.full_name != github.repository }}
+      - name: Install and boot emulator; verify contracts
+        env:
+          IMAGE: ${{ matrix.image }}
+          EMULATOR_MEMORY: ${{ matrix.memory }}
+          EMULATOR_GPU: ${{ matrix.gpu }}
+          CAPTURE_DIAGNOSTICS: ${{ matrix.api == 37 && github.event_name == 'pull_request' }}
+        run: |
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          sdkmanager --version
+          test -e /dev/kvm
+          sudo chmod a+rw /dev/kvm
+          sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'platform-tools' 'emulator' "system-images;$IMAGE;google_apis;x86_64"
+          "$ANDROID_HOME/emulator/emulator" -accel-check
+          export ANDROID_USER_HOME="$RUNNER_TEMP/android-user"
+          export ANDROID_AVD_HOME="$ANDROID_USER_HOME/avd"
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo no | avdmanager create avd -n p1 -p "$ANDROID_AVD_HOME/p1.avd" -k "system-images;$IMAGE;google_apis;x86_64" --device pixel_2
+          test -f "$ANDROID_AVD_HOME/p1.ini"
+          sed -i '/^disk.dataPartition.size=/d' "$ANDROID_AVD_HOME/p1.avd/config.ini"
+          echo 'disk.dataPartition.size=6G' >> "$ANDROID_AVD_HOME/p1.avd/config.ini"
+          "$ANDROID_HOME/emulator/emulator" -list-avds | grep -Fx p1
+          if [ "$CAPTURE_DIAGNOSTICS" = true ]; then
+            bash tools/ci-device-diagnostics.sh start || echo 'Diagnostic setup failed; continuing workload.'
+          fi
+          "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu "$EMULATOR_GPU" -memory "$EMULATOR_MEMORY" -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          emulator_pid=$!
+          cleanup() {
+            result=$?
+            set +e
+            if [ "$CAPTURE_DIAGNOSTICS" = true ]; then
+              bash tools/ci-device-diagnostics.sh finish
+            fi
+            timeout 10 adb -s emulator-5554 emu kill || true
+            exit "$result"
+          }
+          trap cleanup EXIT
+          if ! timeout 600 bash -c 'until [ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" = 1 ]; do kill -0 "$1" 2>/dev/null || exit 1; sleep 2; done' _ "$emulator_pid"; then
+            cat "$RUNNER_TEMP/emulator.log"
+            exit 1
+          fi
+          adb -s emulator-5554 shell df -h /data
+          adb -s emulator-5554 shell input keyevent 82
+          if [ "$IMAGE" = android-37.0 ]; then
+            mkdir -p "$RUNNER_TEMP/device-diagnostics"
+            if ! bash tools/verify-ci-navigation.sh > "$RUNNER_TEMP/device-diagnostics/navigation-stability.log" 2>&1; then
+              cat "$RUNNER_TEMP/device-diagnostics/navigation-stability.log"
+              exit 1
+            fi
+            cat "$RUNNER_TEMP/device-diagnostics/navigation-stability.log"
+            if ! bash tools/verify-ci-renderer.sh > "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log" 2>&1; then
+              cat "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log"
+              exit 1
+            fi
+            cat "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log"
+          fi
+          ./gradlew :storage:connectedDebugAndroidTest :app:connectedDebugAndroidTest :app:assembleDebug :app:assembleDebugAndroidTest
+          pwsh -NoProfile -File tools/verify-process-recovery.ps1 -DeviceSerial emulator-5554 -DebugApk app/build/outputs/apk/debug/app-debug.apk -TestApk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: android-${{ matrix.api }}-reports
+          if-no-files-found: error
+          path: |
+            */build/outputs/androidTest-results/**/*.xml
+            */build/reports/androidTests/**
+            build/recovery-reports/*-seed*.txt
+            build/recovery-reports/*-verify.txt
+            ${{ runner.temp }}/emulator.log
+            ${{ runner.temp }}/device-diagnostics/**

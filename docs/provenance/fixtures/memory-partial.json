@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "incomplete-memory-does-not-publish",
+  "authorship": "hand-authored synthetic target contract",
+  "upstreamCommit": "38b17d10d7630baec9efe53320ca94f8ab122bda",
+  "upstreamTest": "tests/test_memory_complete_parts.py::test_150000_char_row_resumes_without_partial_publication",
+  "input": { "acceptedThroughTurn": 2, "sourceTurn": 3, "sourceCharacterCount": 150000, "completedPartIndices": [0, 1], "missingOrInvalidPartIndices": [2] },
+  "expected": { "acceptedThroughTurn": 2, "publishAcceptedSummary": false, "retainPrivateProgress": true },
+  "plannedPhase": "P4"
+}

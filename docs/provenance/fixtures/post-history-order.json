@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "post-history-tail-order",
+  "authorship": "hand-authored synthetic target contract",
+  "upstreamCommit": "38b17d10d7630baec9efe53320ca94f8ab122bda",
+  "upstreamTest": "tests/test_post_history_placement.py::test_card_tail_follows_history_and_native_policy_follows_card",
+  "input": { "initialSystem": "CARD", "history": ["HISTORY_USER", "HISTORY_ASSISTANT"], "cardTail": "TAIL", "nativePolicy": "POLICY", "currentUser": "CURRENT" },
+  "expected": { "relativeOrder": ["CARD", "HISTORY_USER", "HISTORY_ASSISTANT", "TAIL", "POLICY", "CURRENT"], "lastMessageRole": "user" },
+  "plannedPhase": "P3"
+}

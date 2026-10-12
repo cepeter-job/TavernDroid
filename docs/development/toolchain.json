@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "status": "spec-approved-2026-10-11",
+  "androidStudio": { "distributionVersion": "2026.2.1.8", "release": "Rabbit 1" },
+  "agp": "9.1.1",
+  "gradle": "9.3.1",
+  "kotlin": "2.4.21",
+  "composeCompiler": "2.4.21",
+  "composeBom": "2026.09.00",
+  "gradleJava": { "major": 25, "localVersion": "25.0.3", "localVendor": "JetBrains Runtime" },
+  "jvmTarget": 17,
+  "sdk": { "min": 26, "compile": 37, "target": 37, "platformPackage": "platforms;android-37.0", "buildTools": "36.0.0" },
+  "applicationId": "io.github.cepeterjob.taverndroid",
+  "debugApplicationIdSuffix": ".debug",
+  "upstream": { "repository": "https://github.com/cepeter-job/SillyTavern-Telegram-Bridge", "commit": "38b17d10d7630baec9efe53320ca94f8ab122bda" }
+}

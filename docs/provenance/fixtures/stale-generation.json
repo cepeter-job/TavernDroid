@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "stale-generation-after-reset",
+  "authorship": "hand-authored synthetic target contract",
+  "upstreamCommit": "38b17d10d7630baec9efe53320ca94f8ab122bda",
+  "input": {
+    "captured": { "sessionId": "synthetic-session", "branchId": "main", "incarnation": 1, "revision": 4 },
+    "current": { "sessionId": "synthetic-session", "branchId": "main", "incarnation": 2, "revision": 0 },
+    "lateReply": "The lantern is still lit."
+  },
+  "expected": { "publishCanonicalTurn": false, "canonicalTurnCountAfterReset": 0, "recreateSession": false },
+  "plannedPhase": "P1"
+}
