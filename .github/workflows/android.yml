@@ -23,6 +23,8 @@ jobs:
       - name: Verify wrapper integrity and CI exit contracts
         shell: pwsh
         run: ./tools/tests/ci-entrypoints.tests.ps1
+      - name: Verify diagnostic cleanup exit contract
+        run: bash tools/tests/ci-device-diagnostics.tests.sh
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -94,6 +96,7 @@ jobs:
         env:
           IMAGE: ${{ matrix.image }}
           EMULATOR_MEMORY: ${{ matrix.memory }}
+          CAPTURE_DIAGNOSTICS: ${{ matrix.api == 37 && github.event_name == 'pull_request' }}
         run: |
           test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           test -x "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
@@ -111,9 +114,21 @@ jobs:
           sed -i '/^disk.dataPartition.size=/d' "$ANDROID_AVD_HOME/p1.avd/config.ini"
           echo 'disk.dataPartition.size=6G' >> "$ANDROID_AVD_HOME/p1.avd/config.ini"
           "$ANDROID_HOME/emulator/emulator" -list-avds | grep -Fx p1
+          if [ "$CAPTURE_DIAGNOSTICS" = true ]; then
+            bash tools/ci-device-diagnostics.sh start || echo 'Diagnostic setup failed; continuing workload.'
+          fi
           "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu swiftshader -memory "$EMULATOR_MEMORY" -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
           emulator_pid=$!
-          trap 'adb -s emulator-5554 emu kill || true' EXIT
+          cleanup() {
+            result=$?
+            set +e
+            if [ "$CAPTURE_DIAGNOSTICS" = true ]; then
+              bash tools/ci-device-diagnostics.sh finish
+            fi
+            timeout 10 adb -s emulator-5554 emu kill || true
+            exit "$result"
+          }
+          trap cleanup EXIT
           if ! timeout 600 bash -c 'until [ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d "\r")" = 1 ]; do kill -0 "$1" 2>/dev/null || exit 1; sleep 2; done' _ "$emulator_pid"; then
             cat "$RUNNER_TEMP/emulator.log"
             exit 1
@@ -133,3 +148,4 @@ jobs:
             build/recovery-reports/*-seed*.txt
             build/recovery-reports/*-verify.txt
             ${{ runner.temp }}/emulator.log
+            ${{ runner.temp }}/device-diagnostics/**
