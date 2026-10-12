@@ -108,6 +108,8 @@ jobs:
           mkdir -p "$ANDROID_AVD_HOME"
           echo no | avdmanager create avd -n p1 -p "$ANDROID_AVD_HOME/p1.avd" -k "system-images;$IMAGE;google_apis;x86_64" --device pixel_2
           test -f "$ANDROID_AVD_HOME/p1.ini"
+          sed -i '/^disk.dataPartition.size=/d' "$ANDROID_AVD_HOME/p1.avd/config.ini"
+          echo 'disk.dataPartition.size=6G' >> "$ANDROID_AVD_HOME/p1.avd/config.ini"
           "$ANDROID_HOME/emulator/emulator" -list-avds | grep -Fx p1
           "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu swiftshader -memory "$EMULATOR_MEMORY" -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
           emulator_pid=$!
@@ -116,6 +118,7 @@ jobs:
             cat "$RUNNER_TEMP/emulator.log"
             exit 1
           fi
+          adb -s emulator-5554 shell df -h /data
           adb -s emulator-5554 shell input keyevent 82
           ./gradlew :storage:connectedDebugAndroidTest :app:connectedDebugAndroidTest :app:assembleDebug :app:assembleDebugAndroidTest
           pwsh -NoProfile -File tools/verify-process-recovery.ps1 -DeviceSerial emulator-5554 -DebugApk app/build/outputs/apk/debug/app-debug.apk -TestApk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
