@@ -25,6 +25,8 @@ jobs:
         run: ./tools/tests/ci-entrypoints.tests.ps1
       - name: Verify diagnostic cleanup exit contract
         run: bash tools/tests/ci-device-diagnostics.tests.sh
+      - name: Verify navigation stability contracts
+        run: bash tools/tests/ci-navigation.tests.sh
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -135,6 +137,14 @@ jobs:
           fi
           adb -s emulator-5554 shell df -h /data
           adb -s emulator-5554 shell input keyevent 82
+          if [ "$IMAGE" = android-37.0 ]; then
+            mkdir -p "$RUNNER_TEMP/device-diagnostics"
+            if ! bash tools/verify-ci-navigation.sh > "$RUNNER_TEMP/device-diagnostics/navigation-stability.log" 2>&1; then
+              cat "$RUNNER_TEMP/device-diagnostics/navigation-stability.log"
+              exit 1
+            fi
+            cat "$RUNNER_TEMP/device-diagnostics/navigation-stability.log"
+          fi
           ./gradlew :storage:connectedDebugAndroidTest :app:connectedDebugAndroidTest :app:assembleDebug :app:assembleDebugAndroidTest
           pwsh -NoProfile -File tools/verify-process-recovery.ps1 -DeviceSerial emulator-5554 -DebugApk app/build/outputs/apk/debug/app-debug.apk -TestApk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
