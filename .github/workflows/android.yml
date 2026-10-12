@@ -27,6 +27,8 @@ jobs:
         run: bash tools/tests/ci-device-diagnostics.tests.sh
       - name: Verify navigation stability contracts
         run: bash tools/tests/ci-navigation.tests.sh
+      - name: Verify renderer smoke contracts
+        run: bash tools/tests/ci-renderer.tests.sh
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -75,9 +77,11 @@ jobs:
           - api: 26
             image: android-26
             memory: 2048
+            gpu: swiftshader
           - api: 37
             image: android-37.0
             memory: 4096
+            gpu: software
     env:
       ANDROID_SERIAL: emulator-5554
     steps:
@@ -98,6 +102,7 @@ jobs:
         env:
           IMAGE: ${{ matrix.image }}
           EMULATOR_MEMORY: ${{ matrix.memory }}
+          EMULATOR_GPU: ${{ matrix.gpu }}
           CAPTURE_DIAGNOSTICS: ${{ matrix.api == 37 && github.event_name == 'pull_request' }}
         run: |
           test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
@@ -119,7 +124,7 @@ jobs:
           if [ "$CAPTURE_DIAGNOSTICS" = true ]; then
             bash tools/ci-device-diagnostics.sh start || echo 'Diagnostic setup failed; continuing workload.'
           fi
-          "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu swiftshader -memory "$EMULATOR_MEMORY" -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          "$ANDROID_HOME/emulator/emulator" -avd p1 -port 5554 -no-window -no-audio -no-snapshot -gpu "$EMULATOR_GPU" -memory "$EMULATOR_MEMORY" -cores 2 > "$RUNNER_TEMP/emulator.log" 2>&1 &
           emulator_pid=$!
           cleanup() {
             result=$?
@@ -144,6 +149,11 @@ jobs:
               exit 1
             fi
             cat "$RUNNER_TEMP/device-diagnostics/navigation-stability.log"
+            if ! bash tools/verify-ci-renderer.sh > "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log" 2>&1; then
+              cat "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log"
+              exit 1
+            fi
+            cat "$RUNNER_TEMP/device-diagnostics/renderer-smoke.log"
           fi
           ./gradlew :storage:connectedDebugAndroidTest :app:connectedDebugAndroidTest :app:assembleDebug :app:assembleDebugAndroidTest
           pwsh -NoProfile -File tools/verify-process-recovery.ps1 -DeviceSerial emulator-5554 -DebugApk app/build/outputs/apk/debug/app-debug.apk -TestApk app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
